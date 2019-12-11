@@ -36,13 +36,17 @@ class Filtrar(APIView):
         nombre=nombre.replace('_',' ')
         try:
             apellidos=kwargs.get('apellidos')
-            pellidos=apellidos.replace('_',' ')
+            apellidos=apellidos.replace('_',' ')
+            console.log('apellidos: '+apellidos)
             queryset= Alumno.objects.filter(nombre=nombre, apellidos=apellidos, delet=False)
         except:
             queryset= Alumno.objects.filter(nombre=nombre, delet=False)
         if len(queryset) is 0:
-            carreraid= Carrera.objects.filter(nombre_carrera=nombre, delet=False).values('id')[0]['id']
-            queryset= Alumno.objects.filter(carrera=carreraid, delet=False)
+            try:
+                carreraid= Carrera.objects.filter(nombre_carrera=nombre, delet=False).values('id')[0]['id']
+                queryset= Alumno.objects.filter(carrera=carreraid, delet=False)
+            except:
+                queryset= Alumno.objects.filter(edad=nombre, delet=False)
         serializer = AlumnoSerializers(queryset, many=True)
         return Response(serializer.data)
 
