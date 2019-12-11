@@ -14,9 +14,7 @@ from django.http import Http404
 from rest_framework.permissions import IsAuthenticated  # <-- Here
 
 class AlumnoLista(APIView):
-
-    permission_classes = (IsAuthenticated,)    
-    
+    permission_classes = (IsAuthenticated,)
     def get(self, request, format=None):
         queryset = Alumno.objects.filter(delet=False)
         serializer = AlumnoSerializers(queryset, many=True)
@@ -29,6 +27,24 @@ class AlumnoLista(APIView):
             datas = serializer.data
             return Response(datas)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+
+class Filtrar(APIView):
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, *args, **kwargs):
+        nombre=kwargs.get('nombre')
+        nombre=nombre.replace('_',' ')
+        try:
+            apellidos=kwargs.get('apellidos')
+            pellidos=apellidos.replace('_',' ')
+            queryset= Alumno.objects.filter(nombre=nombre, apellidos=apellidos, delet=False)
+        except:
+            queryset= Alumno.objects.filter(nombre=nombre, delet=False)
+        if len(queryset) is 0:
+            carreraid= Carrera.objects.filter(nombre_carrera=nombre, delet=False).values('id')[0]['id']
+            queryset= Alumno.objects.filter(carrera=carreraid, delet=False)
+        serializer = AlumnoSerializers(queryset, many=True)
+        return Response(serializer.data)
 
 class AlumnoDetalles(APIView):
     permission_classes = (IsAuthenticated,)    
