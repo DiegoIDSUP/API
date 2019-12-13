@@ -13,7 +13,11 @@ urlpatterns = [
 
      # Ulrs carrera
      re_path(r'^listar_carreras/$', views.CarreraLista.as_view() ),
-     re_path(r'^carrera/(?P<id>\d+)$', views.CarreraDetalles.as_view() ),      
+     re_path(r'^carrera/(?P<id>\d+)$', views.CarreraDetalles.as_view() ), 
+
+     #Correo
+     re_path(r'^correo/(?P<asunto>[-\w]+)/(?P<correo>[-\w]+)/(?P<mensaje>[-\w]+)$', views.SendMensajes.as_view() ),
+       
 
      path('rest-auth/', include('rest_auth.urls')),
 ]

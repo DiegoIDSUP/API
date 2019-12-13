@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render
 from myapi.models import Alumno,Carrera
 from myapi.serializer import AlumnoSerializers,CarreraSerializers
@@ -11,7 +13,29 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 
+#Sendgrid libs
+from sendgrid.helpers.mail import Mail
+from sendgrid import SendGridAPIClient
+from django.core.mail import send_mail
+
 from rest_framework.permissions import IsAuthenticated  # <-- Here
+
+class SendMensajes(APIView):
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, *args, **kwargs):
+        asunto=kwargs.get('asunto')
+        asunto=asunto.replace('_',' ')
+        correo=kwargs.get('correo')
+        correo=correo.replace('punto','.')
+        correo=correo.replace('arroba','@')
+        mensaje=kwargs.get('mensaje')
+        mensaje=mensaje.replace('_',' ')
+        send_mail(
+            asunto,
+            mensaje,
+            '153241@ids.upchiapas.edu.mx',
+            [correo],
+            fail_silently=False)
 
 class AlumnoLista(APIView):
     permission_classes = (IsAuthenticated,)
@@ -27,13 +51,13 @@ class AlumnoLista(APIView):
             datas = serializer.data
             return Response(datas)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-
-
+        
 class Filtrar(APIView):
     permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kwargs):
         nombre=kwargs.get('nombre')
         nombre=nombre.replace('_',' ')
+        print(nombre)
         try:
             apellidos=kwargs.get('apellidos')
             apellidos=apellidos.replace('_',' ')
